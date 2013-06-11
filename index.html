@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+    <head><title>Dashboard JS</title></head>
+    <body>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+        /*
+         * Creates a socket and define the callback to be called
+         * for each 'update' event.
+         */
+        var socket = io.connect('http://localhost:8000');
+        socket.on('update', function(data) {
+            console.log(data);
+        });
+        </script>
+        <p>Look at your server</p>
+    </body>
+</html>
