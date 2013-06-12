@@ -34,12 +34,38 @@ function handler (req, res) {
 }
 
 
+
+/*
+ * Calculates the CPU usage.
+ *
+ *  http://stackoverflow.com/questions/3017162/how-to-get-total-cpu-usage-in-linux-c
+ */
+var previous_total_jiffies = 0;
+var previous_work_jiffies = 0;
+
 function readData() {
+    var timestamp = Math.round((new Date()).getTime()/1000);
     var buffer = fs.readFileSync("/proc/stat");
 
-    cpu_idle = buffer.toString().split(' ')[2]
+    tokens = buffer.toString().split(' ');
 
-    io.sockets.emit('update', cpu_idle);
+    total_jiffies =
+        parseInt(tokens[2]) + parseInt(tokens[4]) + parseInt(tokens[6])
+      + parseInt(tokens[8]) + parseInt(tokens[10]) + parseInt(tokens[12])
+      + parseInt(tokens[14]);
+
+    total_work_jiffies =
+        parseInt(tokens[2]) + parseInt(tokens[4]) + parseInt(tokens[6]);
+
+    percentage = (total_work_jiffies - previous_work_jiffies)/(total_jiffies - previous_total_jiffies)*100;
+
+    io.sockets.emit('update', {
+        percentual: percentage, timestamp: timestamp
+    });
+
+    // save them for the next calculations
+    previous_work_jiffies = total_work_jiffies;
+    previous_total_jiffies = total_jiffies;
 
     console.log('[I] update emitted');
 }
