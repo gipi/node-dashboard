@@ -18,6 +18,7 @@ function handler (req, res) {
             return handleLoginPost(req, res);
             break;
         case '/':
+            pathname = '/index.html';
         default:
             fs.readFile(
                 __dirname + '/' + pathname,
